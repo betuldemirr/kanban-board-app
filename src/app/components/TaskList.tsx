@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import Task from './Task';
 import { TaskData } from '../models/TaskData';
@@ -11,7 +11,22 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
     const [columns] = useState(initialColumns);
     const [showModal, setShowModal] = useState(false);
 
-    //drag and drop logic operation
+    const localStorageKey = 'kanban_tasks';
+
+    // Tasks from localStorage
+    useEffect(() => {
+        const storedTasks = localStorage.getItem(localStorageKey);
+        if (storedTasks) {
+            setTasks(JSON.parse(storedTasks));
+        }
+    }, []);
+
+    // Save updated tasks to localStorage
+    useEffect(() => {
+        localStorage.setItem(localStorageKey, JSON.stringify(tasks));
+    }, [tasks]);
+
+    // Drag and drop logic operation
     const onDragEnd = (result: DropResult) => {
         const { source, destination } = result;
 
@@ -77,8 +92,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
                                 <div
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
-                                    className={`w-1/4 p-4 bg-gray-800 rounded-lg shadow-md ${snapshot.isDraggingOver ? 'bg-blue-300' : ''
-                                        }`}
+                                    className={`w-1/4 p-4 bg-gray-800 rounded-lg shadow-md ${snapshot.isDraggingOver ? 'bg-blue-300' : ''}`}
                                 >
                                     <h2 className="text-xl font-semibold mb-4">{colId}</h2>
                                     {taskList.map((task, index) => (

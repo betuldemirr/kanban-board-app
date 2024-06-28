@@ -13,7 +13,7 @@ const initialTasks: { [key: string]: TaskData[] } = {
 
 const initialColumns: string[] = ['Backlog', 'To-Do', 'In Progress', 'Designed'];
 
-const Home: React.FC = () => {
+const App: React.FC = () => {
     return (
         <div className="container w-100 mx-auto mt-4">
             <h1 className="text-center text-4xl font-bold mb-8">Kanban Board App</h1>
@@ -24,4 +24,4 @@ const Home: React.FC = () => {
     );
 };
 
-export default Home;
+export default App;
