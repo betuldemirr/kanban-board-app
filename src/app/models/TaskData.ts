@@ -1,7 +1,5 @@
 export interface TaskData {
+    id: string;
     title: string;
     description: string;
-}
-export interface TaskProps {
-    task: TaskData;
 }

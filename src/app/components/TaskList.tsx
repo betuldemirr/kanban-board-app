@@ -1,31 +1,97 @@
-import React from 'react';
-import { TaskData } from '../models/TaskData';
+import React, { useState } from 'react';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import Task from './Task';
+import { TaskData } from '../models/TaskData';
+import { TaskListProps } from '../models/TaskListProps';
+import { v4 as uuidv4 } from 'uuid';
+import AddTaskPopup from './AddTaskPopup';
 
-interface TaskListProps {
-    column: string;
-    tasks: TaskData[];
-    onOpenPopup: (column: string) => void;
-}
+const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => {
+    const [tasks, setTasks] = useState(initialTasks);
+    const [columns] = useState(initialColumns);
+    const [showModal, setShowModal] = useState(false);
 
-const TaskList: React.FC<TaskListProps> = ({ column, tasks, onOpenPopup }) => {
+    //drag and drop logic operation
+    const onDragEnd = (result: DropResult) => {
+        const { source, destination } = result;
+
+        if (!destination) return;
+
+        const sourceCol = source.droppableId;
+        const destCol = destination.droppableId;
+        const sourceTasks = Array.from(tasks[sourceCol]);
+        const destTasks = Array.from(tasks[destCol]);
+        const [removedTask] = sourceTasks.splice(source.index, 1);
+
+        if (sourceCol === destCol) {
+            sourceTasks.splice(destination.index, 0, removedTask);
+            setTasks({ ...tasks, [sourceCol]: sourceTasks });
+        } else {
+            destTasks.splice(destination.index, 0, removedTask);
+            setTasks({
+                ...tasks,
+                [sourceCol]: sourceTasks,
+                [destCol]: destTasks,
+            });
+        }
+    };
+
+    const addNewTask = (title: string, description: string) => {
+        const newTask: TaskData = {
+            id: uuidv4(),
+            title,
+            description,
+        };
+
+        const updatedTasks = {
+            ...tasks,
+            Backlog: [...tasks.Backlog, newTask],
+        };
+
+        setTasks(updatedTasks);
+    };
+
     return (
-        <div className="bg-gray-800 text-white p-4 rounded-md w-1/4">
-            <h2 className="text-xl font-semibold mb-4">{column}</h2>
-            <ul>
-                {tasks.map((task, index) => (
-                    <Task key={index} task={task} />
-                ))}
-            </ul>
-            {column === 'Backlog' && (
+        <>
+            <div className='w-100 flex justify-center'>
                 <button
-                    className="bg-blue-500 text-white p-2 mt-4 rounded-md w-full"
-                    onClick={() => onOpenPopup(column)}
+                    onClick={() => setShowModal(true)}
+                    className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
                 >
-                    + Add Task
+                    Add New Task
                 </button>
+            </div>
+
+            {showModal && (
+                <AddTaskPopup
+                    onClose={() => setShowModal(false)}
+                    onAddTask={addNewTask}
+                />
             )}
-        </div>
+
+            <DragDropContext onDragEnd={onDragEnd}>
+                <div className="flex space-x-4">
+                    {Object.entries(tasks).map(([colId, taskList]) => (
+                        <Droppable key={colId} droppableId={colId}>
+                            {(provided, snapshot) => (
+                                <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className={`w-1/4 p-4 bg-gray-800 rounded-lg shadow-md ${snapshot.isDraggingOver ? 'bg-blue-300' : ''
+                                        }`}
+                                >
+                                    <h2 className="text-xl font-semibold mb-4">{colId}</h2>
+                                    {taskList.map((task, index) => (
+                                        <Task key={task.id} task={task} index={index} />
+                                    ))}
+                                    {provided.placeholder}
+                                </div>
+                            )}
+                        </Droppable>
+                    ))}
+                </div>
+            </DragDropContext>
+        </>
     );
 };
 
