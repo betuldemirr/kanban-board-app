@@ -66,6 +66,16 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
         setTasks(updatedTasks);
     };
 
+    const deleteTask = (taskId: string) => {
+        const updatedTasks = { ...tasks };
+        for (const column in updatedTasks) {
+            updatedTasks[column] = updatedTasks[column].filter(task => task.id !== taskId);
+        }
+        setTasks(updatedTasks);
+
+        localStorage.setItem(localStorageKey, JSON.stringify(updatedTasks));
+    };
+
     return (
         <>
             <div className='w-100 flex justify-center'>
@@ -92,11 +102,11 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
                                 <div
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
-                                    className={`w-1/4 p-4 bg-gray-800 rounded-lg shadow-md ${snapshot.isDraggingOver ? 'bg-blue-300' : ''}`}
+                                    className={`w-1/4 p-4 bg-gray-700 rounded-lg shadow-md `}
                                 >
                                     <h2 className="text-xl font-semibold mb-4">{colId}</h2>
                                     {taskList.map((task, index) => (
-                                        <Task key={task.id} task={task} index={index} />
+                                        <Task key={task.id} task={task} index={index} onDelete={() => deleteTask(task.id)}/>
                                     ))}
                                     {provided.placeholder}
                                 </div>
