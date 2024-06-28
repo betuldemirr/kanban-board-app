@@ -2,7 +2,6 @@
 
 import React from 'react';
 import TaskList from './components/TaskList';
-import { v4 as uuidv4 } from 'uuid';
 import { TaskData } from './models/TaskData';
 
 const initialTasks: { [key: string]: TaskData[] } = {
