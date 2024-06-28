@@ -11,6 +11,8 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
     const [columns] = useState(initialColumns);
     const [showModal, setShowModal] = useState(false);
 
+    const columnClass = "w-full md:w-1/2 lg:w-1/3 xl:w-1/4";
+
     const localStorageKey = 'kanban_tasks';
 
     // Tasks from localStorage
@@ -95,26 +97,29 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
             )}
 
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="flex space-x-4">
+                <div className="flex flex-wrap justify-start">
                     {Object.entries(tasks).map(([colId, taskList]) => (
                         <Droppable key={colId} droppableId={colId}>
                             {(provided, snapshot) => (
                                 <div
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
-                                    className={`w-1/4 p-4 bg-gray-700 rounded-lg shadow-md `}
+                                    className={`w-full sm:w-1/2 md:w-1/2 lg:w-1/3 xl:w-1/4 p-3`}
                                 >
-                                    <h2 className="text-xl font-semibold mb-4">{colId}</h2>
-                                    {taskList.map((task, index) => (
-                                        <Task key={task.id} task={task} index={index} onDelete={() => deleteTask(task.id)}/>
-                                    ))}
-                                    {provided.placeholder}
+                                    <div className="bg-gray-700 rounded-lg shadow-md p-3">
+                                        <h2 className="text-xl font-semibold mb-4">{colId}</h2>
+                                        {taskList.map((task, index) => (
+                                            <Task key={task.id} task={task} index={index} onDelete={() => deleteTask(task.id)} />
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
                                 </div>
                             )}
                         </Droppable>
                     ))}
                 </div>
             </DragDropContext>
+
         </>
     );
 };
