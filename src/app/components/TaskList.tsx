@@ -97,6 +97,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
             )}
 
             <DragDropContext onDragEnd={onDragEnd}>
+
                 <div className="flex flex-wrap justify-start">
                     {Object.entries(tasks).map(([colId, taskList]) => (
                         <Droppable key={colId} droppableId={colId}>
@@ -118,6 +119,7 @@ const TaskList: React.FC<TaskListProps> = ({ initialTasks, initialColumns }) => 
                         </Droppable>
                     ))}
                 </div>
+                
             </DragDropContext>
 
 
